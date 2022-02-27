@@ -1,5 +1,5 @@
 from chatterbot import ChatBot
-from chatterbot.trainers import ListTrainer
+from chatterbot.trainers import ChatterBotCorpusTrainer, ListTrainer
 
 
 def spawn_bot(name: str, access: bool, adapters: list) -> ChatBot:
@@ -19,7 +19,7 @@ def get_training_data() -> list:
         "glad to hear that.",
         "i'm fine",
         "glad to hear that.",
-        " feel awesome",
+        "i feel awesome",
         "excellent, glad to hear that.",
         "not so good",
         "sorry to hear that.",
@@ -37,6 +37,9 @@ def get_training_data() -> list:
 
 
 def train_bot(training_data: list, my_bot: ChatBot):
+
+    corpus_trainer = ChatterBotCorpusTrainer(my_bot)
+    corpus_trainer.train("chatterbot.corpus.english")
     bot_trainer = ListTrainer(my_bot)
     for data_set in training_data:
         bot_trainer.train(data_set)
@@ -48,6 +51,7 @@ def test_responses(my_bot: ChatBot):
     print(my_bot.get_response("what's your name?"))
     print(my_bot.get_response("show me the pythagorean theorem"))
     print(my_bot.get_response("do you know the law of cosines?"))
+    print(my_bot.get_response("what is the most common english letter?"))
 
 
 def main():
