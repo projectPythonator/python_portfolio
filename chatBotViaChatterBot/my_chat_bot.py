@@ -42,6 +42,14 @@ def train_bot(training_data: list, my_bot: ChatBot):
         bot_trainer.train(data_set)
 
 
+def test_responses(my_bot: ChatBot):
+    print(my_bot.get_response("hi"))
+    print(my_bot.get_response("i feel awesome today"))
+    print(my_bot.get_response("what's your name?"))
+    print(my_bot.get_response("show me the pythagorean theorem"))
+    print(my_bot.get_response("do you know the law of cosines?"))
+
+
 def main():
     math_str: str = "chatterbot.logic.MathematicalEvaluation"
     best_str: str = "chatterbot.logic.BestMatch"
@@ -50,3 +58,7 @@ def main():
     adapters: list = [math_str, best_str]
     my_bot = spawn_bot(bot_name, read_access, adapters)
     train_bot(get_training_data(), my_bot)
+    test_responses(my_bot)
+
+
+main()
