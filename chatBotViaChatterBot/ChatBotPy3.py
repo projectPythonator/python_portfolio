@@ -69,6 +69,14 @@ def test_responses(my_bot: ChatterRobot):
     print(my_bot.talk_to_bot("what is the most common english letter?"))
 
 
+def interactive_talk(my_bot):
+    while True:
+        text_said: str = input("say something to me\n").strip()
+        if "quit proc" == text_said:
+            return
+        print(my_bot.talk_to_bot(text_said))
+
+
 def main():
     my_bot: ChatterRobot = ChatterRobot(
         "PyBot",
@@ -81,6 +89,7 @@ def main():
     my_bot.add_corpus_training()
     my_bot.add_list_training(get_default_training_data())
     test_responses(my_bot)
+    interactive_talk(my_bot)
 
 
 if __name__ == "__main__":
