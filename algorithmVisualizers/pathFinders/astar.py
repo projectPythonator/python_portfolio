@@ -108,12 +108,14 @@ class Visualizer:
     def __init__(self, width: int, height: int, display_name: str):
         self.WINDOW = pygame.display.set_mode((width, height))
         pygame.display.set_caption(display_name)
-        self.grid = [[] for i in range(GRID_ROWS)]
+        self.grid = []
         self.start_cell = None
         self.end_cell = None
 
     def make_grid(self):
+        self.grid = []
         for row in range(GRID_ROWS):
+            self.grid.append([])
             for col in range(GRID_COLS):
                 cell = GridCell(row, col)
                 self.grid[row].append(cell)
@@ -175,6 +177,11 @@ class Visualizer:
             for cell in row:
                 cell.update_neighbours(self.grid)
 
+    def reset_grid(self):
+        self.start_cell = None
+        self.end_cell = None
+        self.make_grid()
+
 
 class AStar:
     def __init__(self, vis_tool):
@@ -184,6 +191,12 @@ class AStar:
         x1, y1 = node_a
         x2, y2 = node_b
         return abs(x1 - x2) + abs(y1 - y2)
+
+    def construct_path(self, cur_node, parents):
+        while cur_node in parents:
+            cur_node = parents[cur_node]
+            cur_node.make_path()
+            self.vis_tool.draw()
 
     def run_a_star(self):
         start_node = self.vis_tool.start_cell
@@ -213,6 +226,8 @@ class AStar:
 
             _, _, cur_node = heapq.heappop(priority_queue)
             if cur_node == end_node:
+                self.construct_path(cur_node, parent_map)
+                end_node.make_end()
                 return True
 
             for neighbour_node in cur_node.neighbours:
@@ -263,7 +278,9 @@ def main_event_loop():
                     a_star_vis_tool.fill_neighbours()
                     path_finder = AStar(a_star_vis_tool)
                     path_finder.run_a_star()
-
+                    started = False
+                if event.key == pygame.K_SPACE:
+                    a_star_vis_tool.reset_grid()
     pygame.quit()
 
 
