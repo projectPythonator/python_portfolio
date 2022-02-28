@@ -13,6 +13,8 @@ CELL_HEIGHT: int = GRID_HEIGHT // GRID_ROWS
 TITLE: str = "A* path finder algorithm"
 
 COLOURS: dict = {}
+START_CODE: int = 0
+END_CODE: int = 0
 
 
 def fill_colours():
@@ -68,6 +70,9 @@ class GridCell:
     def make_barrier(self):
         self.cell_colour = COLOURS["BLACK"]
 
+    def make_start(self):
+        self.cell_colour = COLOURS["ORANGE"]
+
     def make_end(self):
         self.cell_colour = COLOURS["TURQUOISE"]
 
@@ -93,6 +98,8 @@ class Visualizer:
         self.WINDOW = pygame.display.set_mode((width, height))
         pygame.display.set_caption(display_name)
         self.grid = [[] for i in range(GRID_ROWS)]
+        self.start_cell = None
+        self.end_cell = None
 
     def make_grid(self):
         for row in range(GRID_ROWS):
@@ -125,10 +132,23 @@ class Visualizer:
         pygame.display.update()
 
     def get_clicked_pos(self, pos):
-        y, x = pos
+        x, y = pos
         row = y // CELL_HEIGHT
         col = x // CELL_WIDTH
         return row, col
+
+    def left_click_event(self, pos):
+        row, col = self.get_clicked_pos(pos)
+        cur_cell: GridCell = self.grid[row][col]
+        if not self.start_cell and cur_cell != self.end_cell:
+            self.start_cell = cur_cell
+            cur_cell.make_start()
+            return
+        elif not self.end_cell and cur_cell != self.start_cell:
+            self.end_cell = cur_cell
+            cur_cell.make_end()
+        elif cur_cell != self.end_cell and cur_cell != self.start_cell:
+            cur_cell.make_barrier()
 
 
 class AStar:
@@ -141,13 +161,30 @@ class AStar:
         return abs(x1 - x2) + abs(y1 - y2)
 
 
-def main():
-    fill_colours()
+def main_event_loop():
     a_star_vis_tool = Visualizer(GRID_WIDTH, GRID_HEIGHT, TITLE)
     a_star_vis_tool.make_grid()
-    for i in range(1000000):
-        print(i)
+    run = True
+    started = False
+    while run:
         a_star_vis_tool.draw()
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                run = False
+            if started:
+                continue
+            if pygame.mouse.get_pressed()[0]:  # left
+                a_star_vis_tool.left_click_event(pygame.mouse.get_pos())
+
+            elif pygame.mouse.get_pressed()[2]:  # right
+                pass
+
+    pygame.quit()
+
+
+def main():
+    fill_colours()
+    main_event_loop()
 
 
 main()
