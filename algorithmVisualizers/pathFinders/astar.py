@@ -1,7 +1,10 @@
-# import heapq
 # import math
 
+import heapq
+
 import pygame
+
+NESW = [(-1, 0), (0, -1), (1, 0), (0, 1)]
 
 GRID_ROWS: int = 50
 GRID_COLS: int = 50
@@ -33,15 +36,15 @@ def fill_colours():
 
 class GridCell:
     def __init__(self, row: int, col: int):
-        self.row = row
-        self.col = col
+        self.row: int = row
+        self.col: int = col
         self.cell_x: int = col * CELL_WIDTH
         self.cell_y: int = row * CELL_HEIGHT
         self.cell_colour = COLOURS["WHITE"]
         self.cell_neighbours = []
 
-    def get_row_col_pos(self):
-        return self.row, self.col
+    def get_pos(self):
+        return (self.row, self.col)
 
     def is_closed(self) -> bool:
         return self.cell_colour == COLOURS["RED"]
@@ -87,7 +90,15 @@ class GridCell:
         )
 
     def update_neighbours(self, grid):
-        pass
+        self.neighbours = []
+        for r, c in NESW:  # loop north east south west
+            new_row, new_col = self.row + r, self.col + c
+            if (
+                0 <= new_row < GRID_ROWS
+                and 0 <= new_col < GRID_COLS
+                and not grid[new_row][new_col].is_barrier()
+            ):
+                self.neighbours.append(grid[new_row][new_col])
 
     def __lt__(self, other):
         return False
@@ -150,15 +161,84 @@ class Visualizer:
         elif cur_cell != self.end_cell and cur_cell != self.start_cell:
             cur_cell.make_barrier()
 
+    def right_click_event(self, pos):
+        row, col = self.get_clicked_pos(pos)
+        cur_cell: GridCell = self.grid[row][col]
+        cur_cell.reset()
+        if cur_cell == self.start_cell:
+            self.start_cell = None
+        elif cur_cell == self.end_cell:
+            self.end_cell = None
+
+    def fill_neighbours(self):
+        for row in self.grid:
+            for cell in row:
+                cell.update_neighbours(self.grid)
+
 
 class AStar:
-    def __init__(self):
-        pass
+    def __init__(self, vis_tool):
+        self.vis_tool = vis_tool
 
     def huristic(self, node_a, node_b) -> int:
         x1, y1 = node_a
         x2, y2 = node_b
         return abs(x1 - x2) + abs(y1 - y2)
+
+    def run_a_star(self):
+        start_node = self.vis_tool.start_cell
+        end_node = self.vis_tool.end_cell
+        self.vis_tool.draw()
+        item_number = 0
+        in_heap = set()
+        priority_queue = []
+        parent_map = {}
+        distance_g = {
+            cell: float("inf") for row in self.vis_tool.grid for cell in row
+        }
+        distance_f = {
+            cell: float("inf") for row in self.vis_tool.grid for cell in row
+        }
+        distance_g[start_node] = 0
+        distance_f[start_node] = self.huristic(
+            start_node.get_pos(), end_node.get_pos()
+        )
+        heapq.heappush(priority_queue, (0, item_number, start_node))
+        in_heap.add(start_node)
+
+        while len(in_heap) > 0:
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    pygame.quit()
+
+            _, _, cur_node = heapq.heappop(priority_queue)
+            if cur_node == end_node:
+                return True
+
+            for neighbour_node in cur_node.neighbours:
+                temp_g_score = distance_g[cur_node] + 1
+                if temp_g_score < distance_g[neighbour_node]:
+                    parent_map[neighbour_node] = cur_node
+                    distance_g[neighbour_node] = temp_g_score
+                    distance_f[neighbour_node] = temp_g_score + self.huristic(
+                        neighbour_node.get_pos(), end_node.get_pos()
+                    )
+                    if neighbour_node not in in_heap:
+                        item_number += 1
+                        heapq.heappush(
+                            priority_queue,
+                            (
+                                distance_f[neighbour_node],
+                                item_number,
+                                neighbour_node,
+                            ),
+                        )
+                        neighbour_node.make_open()
+                        in_heap.add(neighbour_node)
+            self.vis_tool.draw()
+            if cur_node != start_node:
+                cur_node.make_closed()
+        return False
 
 
 def main_event_loop():
@@ -175,9 +255,14 @@ def main_event_loop():
                 continue
             if pygame.mouse.get_pressed()[0]:  # left
                 a_star_vis_tool.left_click_event(pygame.mouse.get_pos())
-
             elif pygame.mouse.get_pressed()[2]:  # right
-                pass
+                a_star_vis_tool.right_click_event(pygame.mouse.get_pos())
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_RETURN and not started:
+                    started = True
+                    a_star_vis_tool.fill_neighbours()
+                    path_finder = AStar(a_star_vis_tool)
+                    path_finder.run_a_star()
 
     pygame.quit()
 
