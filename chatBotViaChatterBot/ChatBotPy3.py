@@ -50,6 +50,9 @@ class ChatterRobot:
         for data_set in training_data:
             bot_trainer.train(data_set)
 
+    def talk_to_bot(self, talk_in_text: str) -> str:
+        return self.chat_bot.get_response(talk_in_text)
+
 
 def main():
     math_args: str = "chatterbot.logic.MathematicalEvaluation"
