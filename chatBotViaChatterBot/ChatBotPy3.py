@@ -5,6 +5,7 @@ READ_ONLY = True
 
 
 def get_default_training_data() -> list:
+    """all default datasets will exist here to help the bot."""
     small_talk = [
         "hi there!",
         "hi!",
@@ -36,6 +37,11 @@ def get_default_training_data() -> list:
 
 
 class ChatterRobot:
+    """Chat bot class vars so far only have chat_bot which is the bot object
+    for this class. It takes in a name, a read only variable and a adapter
+    for logic.
+    """
+
     def __init__(self, name: str, perms: bool, adapters: list):
         self.chat_bot = ChatBot(
             name=name, read_only=perms, logic_adapters=adapters
@@ -54,15 +60,28 @@ class ChatterRobot:
         return self.chat_bot.get_response(talk_in_text)
 
 
+def test_responses(my_bot: ChatterRobot):
+    print(my_bot.talk_to_bot("hi"))
+    print(my_bot.talk_to_bot("i feel awesome today"))
+    print(my_bot.talk_to_bot("what's your name?"))
+    print(my_bot.talk_to_bot("show me the pythagorean theorem"))
+    print(my_bot.talk_to_bot("do you know the law of cosines?"))
+    print(my_bot.talk_to_bot("what is the most common english letter?"))
+
+
 def main():
-    math_args: str = "chatterbot.logic.MathematicalEvaluation"
-    best_args: str = "chatterbot.logic.BestMatch"
-    bot_name: str = "PyBot"
-    perms: bool = READ_ONLY
-    adapters: list = [math_args, best_args]
-    my_bot: ChatterRobot = ChatterRobot(bot_name, perms, adapters)
+    my_bot: ChatterRobot = ChatterRobot(
+        "PyBot",
+        False,
+        [
+            "chatterbot.logic.MathematicalEvaluation",
+            "chatterbot.logic.BestMatch",
+        ],
+    )
     my_bot.add_corpus_training()
     my_bot.add_list_training(get_default_training_data())
+    test_responses(my_bot)
 
 
-main()
+if __name__ == "__main__":
+    main()
