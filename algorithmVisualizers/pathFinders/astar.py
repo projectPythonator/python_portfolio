@@ -91,13 +91,11 @@ class GridCell:
 
     def update_neighbours(self, grid):
         self.neighbours = []
+        if self.is_barrier():
+            return
         for r, c in NESW:  # loop north east south west
             new_row, new_col = self.row + r, self.col + c
-            if (
-                0 <= new_row < GRID_ROWS
-                and 0 <= new_col < GRID_COLS
-                and not grid[new_row][new_col].is_barrier()
-            ):
+            if not grid[new_row][new_col].is_barrier():
                 self.neighbours.append(grid[new_row][new_col])
 
     def __lt__(self, other):
@@ -119,6 +117,12 @@ class Visualizer:
             for col in range(GRID_COLS):
                 cell = GridCell(row, col)
                 self.grid[row].append(cell)
+        for row in range(GRID_ROWS):
+            self.grid[row][0].make_barrier()
+            self.grid[row][GRID_COLS - 1].make_barrier()
+        for col in range(GRID_COLS):
+            self.grid[0][col].make_barrier()
+            self.grid[GRID_ROWS - 1][col].make_barrier()
 
     def draw_grid(self):
         for row in range(GRID_ROWS):
@@ -152,6 +156,8 @@ class Visualizer:
 
     def left_click_event(self, pos):
         row, col = self.get_clicked_pos(pos)
+        if not (1 <= row < (GRID_ROWS - 1) and 1 <= col < (GRID_COLS - 1)):
+            return
         cur_cell: GridCell = self.grid[row][col]
         if not self.start_cell and cur_cell != self.end_cell:
             self.start_cell = cur_cell
@@ -165,6 +171,8 @@ class Visualizer:
 
     def right_click_event(self, pos):
         row, col = self.get_clicked_pos(pos)
+        if not (1 <= row < (GRID_ROWS - 1) and 1 <= col < (GRID_COLS - 1)):
+            return
         cur_cell: GridCell = self.grid[row][col]
         cur_cell.reset()
         if cur_cell == self.start_cell:
@@ -187,7 +195,7 @@ class AStar:
     def __init__(self, vis_tool):
         self.vis_tool = vis_tool
 
-    def huristic(self, node_a, node_b) -> int:
+    def huristic(self, node_a, node_b) -> float:
         x1, y1 = node_a
         x2, y2 = node_b
         return abs(x1 - x2) + abs(y1 - y2)
@@ -197,6 +205,7 @@ class AStar:
             cur_node = parents[cur_node]
             cur_node.make_path()
             self.vis_tool.draw()
+        cur_node.make_start()
 
     def run_a_star(self):
         start_node = self.vis_tool.start_cell
@@ -216,7 +225,7 @@ class AStar:
         distance_f[start_node] = self.huristic(
             start_node.get_pos(), end_node.get_pos()
         )
-        heapq.heappush(priority_queue, (0, item_number, start_node))
+        heapq.heappush(priority_queue, (0, item_number, 0, start_node))
         in_heap.add(start_node)
 
         while len(in_heap) > 0:
@@ -224,7 +233,7 @@ class AStar:
                 if event.type == pygame.QUIT:
                     pygame.quit()
 
-            _, _, cur_node = heapq.heappop(priority_queue)
+            _, _, g_dist, cur_node = heapq.heappop(priority_queue)
             if cur_node == end_node:
                 self.construct_path(cur_node, parent_map)
                 end_node.make_end()
@@ -245,6 +254,7 @@ class AStar:
                             (
                                 distance_f[neighbour_node],
                                 item_number,
+                                temp_g_score,
                                 neighbour_node,
                             ),
                         )
