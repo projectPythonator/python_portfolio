@@ -60,7 +60,6 @@ class APIData:
         file_stream = ConfigParser()
         file_stream.read(file_path)
         self.api_key = file_stream["api_key"]["key"]
-        file_stream.close()
 
     def find_weather_by_city(self, city_name):
         api_report = requests.get(self.url_api.format(city_name, self.api_key))
@@ -116,7 +115,7 @@ class AppWindow:
             self.app_window,
             "search weather",
             ("Arial", 25, "bold"),
-            "while",
+            "white",
             "red",
             self.display_weather,
             20,
@@ -131,8 +130,28 @@ class AppWindow:
             )
             self.label_map["temperature"].set_by_key(
                 "text",
-                "{} C, {} F".format(weather_report[1], weather_report[2]),
+                "{:.2f} C, {:.2f} F".format(
+                    float(weather_report[2]), float(weather_report[3])
+                ),
             )
-            self.label_map["weather"].set_by_key("text", weather_report[0])
+            self.label_map["weather"].set_by_key("text", weather_report[4])
         else:
             messagebox.showerror("error", "city does not exist")
+
+    def enter_loop(self):
+        self.app_window.mainloop()
+
+
+def main():
+    api_link = "http://api.openweathermap.org/data/2.5/weather?q={}&appid={}"
+    api_file = "./weatherApplication/weatherKey.ini"
+    api_inf = APIData(api_link)
+    api_inf.grab_api_key(api_file)
+    my_app = AppWindow("my weather app", "black", "700x400", api_inf)
+    my_app.fill_entries()
+    my_app.fill_buttons()
+    my_app.fill_labels()
+    my_app.enter_loop()
+
+
+main()
