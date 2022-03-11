@@ -1,6 +1,6 @@
 from functools import total_ordering
 
-from node_cell.py import NodeCell
+from node_cell import NodeCell
 
 
 @total_ordering
@@ -24,6 +24,9 @@ class NodeElem:
 
     def observe(self):
         self.cell.make_observing()
+
+    def unobserve(self):
+        self.cell.make_unsorted()
 
     def update_key(self, new_key):
         self.key = new_key

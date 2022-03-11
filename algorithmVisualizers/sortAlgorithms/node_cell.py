@@ -1,5 +1,5 @@
 import pygame
-from colour.py import Colour
+from colours import Colour
 
 
 class NodeCell:

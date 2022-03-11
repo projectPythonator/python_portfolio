@@ -1,6 +1,6 @@
 import pygame
-from colours.py import Colour
-from node_array.py import NodeArray
+from colours import Colour
+from node_array import NodeArray
 
 
 class VisTool:
@@ -13,7 +13,13 @@ class VisTool:
         self.vis_arr.assign_data_set(unsorted_array)
 
     def reshuffle(self):
-        self.vis_arr.shuffle_array()
+        self.vis_arr.shuffle_array(1)
+
+    def update_window(self, a, b):
+        self.window.fill(Colour.BLACK)
+        self.vis_arr.draw_ith(self.window, a)
+        self.vis_arr.draw_ith(self.window, b)
+        pygame.display.update()
 
     def draw(self):
         self.window.fill(Colour.BLACK)

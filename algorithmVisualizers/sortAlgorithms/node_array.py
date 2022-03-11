@@ -1,6 +1,6 @@
 from random import shuffle
 
-from node_elem.py import NodeElem
+from node_elem import NodeElem
 
 
 class NodeArray:
@@ -14,6 +14,9 @@ class NodeArray:
         self.node_arr[a].update_index(b)
         self.node_arr[b].update_index(a)
         self.node_arr[a], self.node_arr[b] = self.node_arr[b], self.node_arr[a]
+
+    def draw_ith(self, win, a):
+        self.node_arr[a].draw(win)
 
     def draw(self, win):
         for el in self.node_arr:
@@ -32,3 +35,6 @@ class NodeArray:
         for _ in range(runs):
             shuffle(self.key_arr)
         self.reset_node_arr()
+
+    def compare_ab(self, a, b):
+        return self.node_arr[b] < self.node_arr[a]
