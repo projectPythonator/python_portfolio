@@ -19,5 +19,12 @@ class NodeElem:
     def __lt__(self, other):
         return (self.key, self.index) < (other.key, other.index)
 
+    def draw(self, win):
+        self.cell.draw(win, self.key)
+
     def observe(self):
         self.cell.make_observing()
+
+    def update_key(self, new_key):
+        self.key = new_key
+        self.cell.update_height(self.key)

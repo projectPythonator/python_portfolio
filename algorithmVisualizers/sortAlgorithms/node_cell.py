@@ -11,7 +11,10 @@ class NodeCell:
         self.height = cell_height
         self.colour = Colour.WHITE
 
-    def is_observed(self) -> bool:
+    def update_height(self, new_height: int):
+        self.height = new_height
+
+    def is_observing(self) -> bool:
         return self.colour == Colour.RED
 
     def is_unsorted(self) -> bool:
