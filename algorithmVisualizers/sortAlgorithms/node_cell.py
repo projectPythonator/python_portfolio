@@ -3,12 +3,12 @@ from colour.py import Colour
 
 
 class NodeCell:
-    padding_x = 20
-    padding_y = 20
+    cell_pad_x = 20
+    cell_pad_y = 20
+    cell_width = 2
 
-    def __init__(self, cell_height: int, cell_width: int):
+    def __init__(self, cell_height: int):
         self.height = cell_height
-        self.width = cell_width
         self.colour = Colour.WHITE
 
     def is_observed(self) -> bool:
@@ -40,9 +40,9 @@ class NodeCell:
             win,
             self.colour,
             (
-                (NodeCell.padding_x + self.width * pos),
-                NodeCell.padding_y,
-                self.width,
+                (NodeCell.cell_pad_x + NodeCell.cell_width * pos),
+                NodeCell.cell_pad_y,
+                NodeCell.cell_width,
                 self.height,
             ),
         )
