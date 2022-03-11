@@ -20,7 +20,7 @@ class NodeElem:
         return (self.key, self.index) < (other.key, other.index)
 
     def draw(self, win):
-        self.cell.draw(win, self.key)
+        self.cell.draw(win, self.index)
 
     def observe(self):
         self.cell.make_observing()
@@ -28,3 +28,6 @@ class NodeElem:
     def update_key(self, new_key):
         self.key = new_key
         self.cell.update_height(self.key)
+
+    def update_index(self, new_pos):
+        self.index = new_pos
