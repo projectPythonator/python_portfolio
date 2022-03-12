@@ -28,6 +28,9 @@ class NodeElem:
     def unobserve(self):
         self.cell.make_unsorted()
 
+    def selected(self):
+        self.cell.make_sorted()
+
     def update_key(self, new_key):
         self.key = new_key
         self.cell.update_height(self.key)
