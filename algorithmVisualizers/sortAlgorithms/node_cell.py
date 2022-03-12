@@ -4,7 +4,7 @@ from colours import Colour
 
 class NodeCell:
     cell_pad_x = 20
-    cell_pad_y = 20
+    win_height = 800
     cell_width = 2
 
     def __init__(self, cell_height: int):
@@ -41,10 +41,20 @@ class NodeCell:
     def draw(self, win, pos):
         pygame.draw.rect(
             win,
+            Colour.BLACK,
+            (
+                (NodeCell.cell_pad_x + NodeCell.cell_width * pos),
+                0,
+                NodeCell.cell_width,
+                NodeCell.win_height - self.height,
+            ),
+        )
+        pygame.draw.rect(
+            win,
             self.colour,
             (
                 (NodeCell.cell_pad_x + NodeCell.cell_width * pos),
-                NodeCell.cell_pad_y,
+                NodeCell.win_height - self.height,
                 NodeCell.cell_width,
                 self.height,
             ),
