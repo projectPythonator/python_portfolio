@@ -1,3 +1,5 @@
+from time import sleep
+
 import pygame
 from colours import Colour
 from vis_tool import VisTool
@@ -13,9 +15,11 @@ def insertion_sort(tool):
         tool.draw()
         j = i
         while j > 0 and tool.vis_arr.compare_ab(j, j - 1):
-            tool.draw()
+            tool.update_nodes((j, j - 1))
+            sleep(0.0001)
             tool.vis_arr.swap(j, j - 1)
-
+            tool.update_nodes((j, j - 1))
+            sleep(0.0001)
             j -= 1
         tool.vis_arr.node_arr[j].unobserve()
         i += 1
