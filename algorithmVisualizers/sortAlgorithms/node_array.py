@@ -15,7 +15,7 @@ class NodeArray:
         self.node_arr[b].update_index(a)
         self.node_arr[a], self.node_arr[b] = self.node_arr[b], self.node_arr[a]
 
-    def draw_ith(self, win, a):
+    def draw_node(self, win, a):
         self.node_arr[a].draw(win)
 
     def draw(self, win):
@@ -37,4 +37,4 @@ class NodeArray:
         self.reset_node_arr()
 
     def compare_ab(self, a, b):
-        return self.node_arr[b] < self.node_arr[a]
+        return self.node_arr[a] < self.node_arr[b]
