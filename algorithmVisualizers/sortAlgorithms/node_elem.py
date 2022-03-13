@@ -31,9 +31,5 @@ class NodeElem:
     def selected(self):
         self.cell.make_sorted()
 
-    def update_key(self, new_key):
-        self.key = new_key
-        self.cell.update_height(self.key)
-
     def update_index(self, new_pos):
         self.index = new_pos
