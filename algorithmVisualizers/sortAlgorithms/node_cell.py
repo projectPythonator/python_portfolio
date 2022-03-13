@@ -68,7 +68,7 @@ class NodeCell:
         if cell_height < 0:
             raise HeightNegativeError(cell_height)
         if cell_height > NodeCell.win_height:
-            raise HeightOffScreenError
+            raise HeightOffScreenError(NodeCell.win_height, cell_height)
         self.height = cell_height
         self.colour = Colour.WHITE
 
@@ -104,6 +104,8 @@ class NodeCell:
         )
 
     def draw(self, win, pos):
+        if pos < 0:
+            raise NegativeIndexError(pos)
         self.draw_bar(
             win,
             Colour.BLACK,
@@ -125,17 +127,17 @@ class NodeCell:
 class NodeCellInitTest(unittest.TestCase):
     def test_invalid_height_1(self):
         height_value = -1
-        with self.assertRaises(Exception) as cm:
+        with self.assertRaises(HeightNegativeError) as cm:
             self.node_cell = NodeCell(height_value)
         nche_exception = cm.exception
         self.assertEqual(nche_exception.height, height_value)
 
     def test_invalid_height_2(self):
-        height_value = -1000000
-        with self.assertRaises(Exception) as cm:
+        height_value = 1000000
+        with self.assertRaises(HeightOffScreenError) as cm:
             self.node_cell = NodeCell(height_value)
-        nche_exception = cm.exception
-        self.assertEqual(nche_exception.height, height_value)
+        hose_exception = cm.exception
+        self.assertTrue(hose_exception.max_height < hose_exception.height)
 
     def test_valid_height_positive_1(self):
         node_cell = NodeCell(1)
